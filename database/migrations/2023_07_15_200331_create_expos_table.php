@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('expo_details', function (Blueprint $table) {
+        Schema::create('expos', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->longText('info');
-            // $table->string('image');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

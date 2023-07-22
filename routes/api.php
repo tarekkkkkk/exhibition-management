@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TestController;
+use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\Expo\ExpoController;
 use App\Http\Controllers\Expo\ProductController;
 use App\Http\Controllers\Expo\BrandController;
@@ -10,32 +10,38 @@ Route::group(
 
    ['prefix' => 'Auth'],
 
-   function(){
-    Route::post('Reg', [TestController::class,'Register']);
-    Route::post('login', [TestController::class,'Login']);
-
-    // Route::post('login', 'TestController@Login')->name('Login');
+   function () {
+      Route::post('Reg', [AuthenticationController::class, 'register']);
+      Route::get('login', [AuthenticationController::class, 'login']);
    }
 );
 
-// #Routers for EXPO
-Route::post('store', [ExpoController::class,'store']);
-Route::post('show/{id}', [ExpoController::class,'show']);
-Route::post('index', [ExpoController::class,'index']);
-Route::post('edit/{id}', [ExpoController::class,'update']);
-Route::post('delete/{id}', [ExpoController::class,'destroy']);
+Route::middleware(['auth:sanctum'])->group(function () {
+   // #Routers for EXPO
+   Route::post('expos', [ExpoController::class, 'store']);
+   Route::get('expos/{id}', [ExpoController::class, 'show']);
+   Route::get('expos', [ExpoController::class, 'index']);
+   Route::put('expos/{id}', [ExpoController::class, 'update']);
+   Route::delete('expos/{id}', [ExpoController::class, 'destroy']);
+   Route::get('expos/{id}/brands', [ExpoController::class, 'expoBrands']);
 
 
-// #Routers To Buy things
-Route::post('product-store', [ProductController::class,'store']);
-Route::post('product-show/{id}', [ProductController::class,'show']);
-Route::post('product-index', [ProductController::class,'index']);
-Route::post('product-edit/{id}', [ProductController::class,'update']);
-Route::post('product-delete/{id}', [ProductController::class,'destroy']);
+   // #Routers To Buy things
+   Route::post('products', [ProductController::class, 'store']);
+   Route::get('products/{id}', [ProductController::class, 'show']);
+   Route::get('products', [ProductController::class, 'index']);
+   Route::put('products/{id}', [ProductController::class, 'update']);
+   Route::delete('products/{id}', [ProductController::class, 'destroy']);
+   Route::get('fav-products', [ProductController::class, 'favouriteProducts']);
 
-// #Routers About Brands
-Route::post('Brand-store', [BrandController::class,'store']);
-Route::post('Brand-show/{id}', [BrandController::class,'show']);
-Route::post('Brand-index', [BrandController::class,'index']);
-Route::post('Brand-edit/{id}', [BrandController::class,'update']);
-Route::post('Brand-delete/{id}', [BrandController::class,'destroy']);
+   // #Routers About Brands
+   Route::post('brands', [BrandController::class, 'store']);
+   Route::get('brands/{id}', [BrandController::class, 'show']);
+   Route::get('brands', [BrandController::class, 'index']);
+   Route::put('brands/{id}', [BrandController::class, 'update']);
+   Route::delete('brands/{id}', [BrandController::class, 'destroy']);
+   Route::get('my-brand', [BrandController::class, 'myBrand']);
+
+
+   Route::post('/add-to-fav', [ProductController::class, 'addToFavourite']);
+});

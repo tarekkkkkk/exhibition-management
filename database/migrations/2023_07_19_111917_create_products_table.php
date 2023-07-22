@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('price');
+            $table->string('image')->nullable();
+            $table->foreignId('brand_id')->constrained('brands');
             $table->timestamps();
         });
     }

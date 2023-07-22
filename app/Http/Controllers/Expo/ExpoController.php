@@ -3,19 +3,26 @@
 namespace App\Http\Controllers\Expo;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use App\Models\Expo;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use PhpParser\Node\Stmt\Foreach_;
 
 class ExpoController extends Controller
 {
     public function index()
     {
-        $expo = Expo::all();
+        $expos = Expo::select('id', 'name', 'info', 'image')->get();
+
+        $exposWithUrls = $expos->map(function ($item, $key) {
+            $item->image = url('/storage' . $item->image);
+            return $item;
+        });
 
         return response()->json([
-
-            'info' => $expo,
+            'data' => $exposWithUrls,
             'status' => 'success'
         ], 200);
     }
@@ -27,41 +34,48 @@ class ExpoController extends Controller
             'image' => 'required|mimes:png,jpg,jpeg,gif,jfif,svg|max:2048',
         ]);
 
-        $item = new Expo();
-        $item->name  = $validatedData['name'];
-        $item->info  = $validatedData['info'];
-        $item->image = $validatedData['image'];
-        $item->save();
+        $expo = Expo::create([
+            'name' => $request->name,
+            'info' => $request->info,
+        ]);
 
-        if ($request->has('image')) {
-            $image = $request->image;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $fileName = time() . '-' . $image->getClientOriginalName();
 
-            foreach ($image as $key => $value) {
-                $name = time() . $key . '.' . $value->getClientOrginalExtention();
+            Storage::disk('public')->put('/expo-images' . '/' . $fileName, File::get($image));
 
-                $path = public_path('upload');
+            $expo->image = '/expo-images' . '/' .  $fileName;
+            $expo->save();
+        }
 
-                $image->move($path, $name);
-            }   
         return response()->json([
+            'data' => collect([
+                'id' => $expo->id,
+                'name' => $expo->name,
+                'info' => $expo->info,
+                'image' => url('storage/' . $expo->image),
+            ]),
             'message' => 'Items has been added succefully',
-            'status' => 'success',
-            'Data' => $item
-        ], 200);
-      }
+        ], 201);
     }
     public function show(string $id)
     {
-        $Expo = Expo::find($id);
-        if ($Expo == true) {
+        $expo = Expo::findOrFail($id);
+        if ($expo == true) {
             return response()->json([
                 'status' => 'success',
-                'data' => $Expo
+                'data' =>  collect([
+                    'id' => $expo->id,
+                    'name' => $expo->name,
+                    'info' => $expo->info,
+                    'image' => url('storage/' . $expo->image),
+                ]),
             ], 200);
         } else {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Post not found'
+                'message' => 'Expo not found'
             ], 404);
         }
     }
@@ -71,11 +85,24 @@ class ExpoController extends Controller
 
         if ($expo) {
             $expo->update($request->all());
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $fileName = time() . '-' . $image->getClientOriginalName();
 
+                Storage::disk('public')->put('/expo-images' . '/' . $fileName, File::get($image));
+
+                $expo->image = '/expo-images' . '/' .  $fileName;
+                $expo->save();
+            }
             return response()->json([
                 'status' => 'success',
                 'message' => 'expo updated successfully',
-                'data' => $expo
+                'data' =>  collect([
+                    'id' => $expo->id,
+                    'name' => $expo->name,
+                    'info' => $expo->info,
+                    'image' => url('storage/' . $expo->image),
+                ]),
             ], 200);
         } else {
             return response()->json([
@@ -101,5 +128,23 @@ class ExpoController extends Controller
                 'message' => 'expo not found'
             ], 404);
         }
+    }
+
+    public function expoBrands($id)
+    {
+        $expo = Expo::findOrFail($id);
+
+        // $brands = Brand::where('expo_id', $expo->id)->select('id', 'name', 'info', 'image')->get();
+        $brands = $expo->brands;
+
+        $brandsWithUrls = $brands->map(function ($item, $key) {
+            $item->image = url('/storage' . $item->image);
+            return $item;
+        });
+
+        return response()->json([
+            'data' => $brandsWithUrls,
+            'status' => 'success'
+        ], 200);
     }
 }

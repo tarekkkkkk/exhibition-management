@@ -14,4 +14,9 @@ class Expo extends Model
         'info',
         'image'
     ];
+
+    public function brands()
+    {
+        return $this->hasMany(Brand::class);
+    }
 }
