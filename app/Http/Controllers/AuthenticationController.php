@@ -13,12 +13,14 @@ class AuthenticationController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|min:6'
+            'password' => 'required|string|min:6',
+            'confirm_password' => 'required|string|min:6|same:password'
         ]);
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            // 'confirm_password' => $request->confirm_password    
         ]);
 
         return response()->json([
