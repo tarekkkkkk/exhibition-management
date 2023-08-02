@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Brand::class);
     }
+
+    public function expo()
+    {
+        return $this->hasMany(Expo::class);
+    }
 }

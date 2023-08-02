@@ -143,7 +143,7 @@ class ExpoController extends Controller
         });
 
         return response()->json([
-            'data' => $brandsWithUrls,
+            'data' => $brandsWithUrls,  
             'status' => 'success'
         ], 200);
     }

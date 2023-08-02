@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->longText('info');
             $table->string('image')->nullable();
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }
@@ -28,13 +29,3 @@ return new class extends Migration
         //
     }
 };
-
-
-
-
-
-
-
-
-
-

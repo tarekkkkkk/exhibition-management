@@ -7,18 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\Expo;
 use App\Models\Favourite;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $products = Product::select(['id', 'name', 'price', 'image', 'brand_id'])->get();
 
-        $productsWithUrls = $products->map(function ($item, $key) {
+        $productsWithUrls = $products->map(function ($item, $key) use ($request) {
             $item->image = url('/storage' . $item->image);
-            $item->is_added_to_favourite = Favourite::where('product_id', $item->id)->where('user_id', auth()->user()->id)->first() ? true : false;
+            $item->is_added_to_favourite = Favourite::where('product_id', $item->id)->where('user_id',  $request->user('sanctum')?->id)->first() ? true : false;
             return $item;
         });
 

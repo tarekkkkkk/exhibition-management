@@ -16,11 +16,15 @@ Route::group(
    }
 );
 
+Route::get('expos', [ExpoController::class, 'index']);
+Route::get('products', [ProductController::class, 'index']);
+Route::get('brands', [BrandController::class, 'index']);
+
+
 Route::middleware(['auth:sanctum'])->group(function () {
    // #Routers for EXPO
    Route::post('expos', [ExpoController::class, 'store']);
    Route::get('expos/{id}', [ExpoController::class, 'show']);
-   Route::get('expos', [ExpoController::class, 'index']);
    Route::put('expos/{id}', [ExpoController::class, 'update']);
    Route::delete('expos/{id}', [ExpoController::class, 'destroy']);
    Route::get('expos/{id}/brands', [ExpoController::class, 'expoBrands']);
@@ -29,7 +33,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
    // #Routers To Buy things
    Route::post('products', [ProductController::class, 'store']);
    Route::get('products/{id}', [ProductController::class, 'show']);
-   Route::get('products', [ProductController::class, 'index']);
    Route::put('products/{id}', [ProductController::class, 'update']);
    Route::delete('products/{id}', [ProductController::class, 'destroy']);
    Route::get('fav-products', [ProductController::class, 'favouriteProducts']);
@@ -37,7 +40,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
    // #Routers About Brands
    Route::post('brands', [BrandController::class, 'store']);
    Route::get('brands/{id}', [BrandController::class, 'show']);
-   Route::get('brands', [BrandController::class, 'index']);
    Route::put('brands/{id}', [BrandController::class, 'update']);
    Route::delete('brands/{id}', [BrandController::class, 'destroy']);
    Route::get('my-brand', [BrandController::class, 'myBrand']);
