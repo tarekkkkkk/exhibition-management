@@ -150,7 +150,7 @@ class BrandController extends Controller
         }
     }
 
-    public function     myBrand()
+    public function myBrand()
     {
         $brand = auth()->user()->brand;
         $brand->image = url('storage/' . $brand->image);

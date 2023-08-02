@@ -91,9 +91,10 @@ class AuthenticationController extends Controller
         $brand = Brand::create([
             'name' => $request->brand_name,
             'info' => $request->brand_info,
-            'expo_id' => $request->expo_id,
-            'user_id' => auth()->user()->id
+            'user_id' => $user->id
         ]);
+
+        $brand->expos()->sync($request->expo_id);
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');

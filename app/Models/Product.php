@@ -13,12 +13,17 @@ class Product extends Model
         'name',
         'price',
         'image',
-        'brand_id'
+        'brand_expo_id'
     ];
 
     public function brand()
     {
-        return $this->belongsTo(Brand::class);
+        return $this->brandExpo()->brand();
+    }
+
+    public function brandExpo()
+    {
+        return $this->belongsTo(BrandExpo::class);
     }
     // public function user()
     // {
@@ -29,5 +34,4 @@ class Product extends Model
     {
         return $this->hasMany(Favourite::class);
     }
-
 }

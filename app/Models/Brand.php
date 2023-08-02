@@ -13,7 +13,6 @@ class Brand extends Model
         'name',
         'info',
         'image',
-        'expo_id',
         'user_id'
     ];
     public function products()
@@ -21,12 +20,18 @@ class Brand extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function expo(){
-        return $this->belongsTo(Expo::class);
+    public function expos()
+    {
+        return $this->belongsToMany(Expo::class, 'brand_expo');
     }
 
+    public function brandExpo()
+    {
+        return $this->hasMany(BrandExpo::class);
+    }
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

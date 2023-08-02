@@ -19,7 +19,7 @@ class ProductController extends Controller
 
         $productsWithUrls = $products->map(function ($item, $key) use ($request) {
             $item->image = url('/storage' . $item->image);
-            $item->is_added_to_favourite = Favourite::where('product_id', $item->id)->where('user_id',  $request->user('sanctum')?->id)->first() ? true : false;
+            $item->is_added_to_favourite = Favourite::where('product_id', $item->id)->where('user_id',  $request->user('sanctum')?->id) ? true : false;
             return $item;
         });
 
@@ -34,13 +34,12 @@ class ProductController extends Controller
             'name' => 'required|string',
             'price' => 'required',
             'image' => 'required|mimes:png,jpg,jpeg,gif,jfif,svg|max:2048',
-            'brand_id' => 'required|exists:brands,id'
+            'expo_id' => 'required|exists:expos,id'
         ]);
 
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
-            'brand_id' => $request->brand_id
         ]);
 
         if ($request->hasFile('image')) {
@@ -52,6 +51,11 @@ class ProductController extends Controller
             $product->image = '/product-images' . '/' .  $fileName;
             $product->save();
         }
+
+        $brand = auth()->user()->brand;
+        $expo = Expo::find($request->expo_id);
+        $brand_expo = $brand->brandExpo()->where('expo_id', $expo->id)->first();
+        $product->brand_expo_id = $brand_expo->id;
 
         return response()->json([
             'message' => 'Products has been added successfully',

@@ -18,10 +18,15 @@ class Expo extends Model
 
     public function brands()
     {
-        return $this->hasMany(Brand::class);
+        return $this->belongsToMany(Brand::class, 'brand_expo');
     }
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function brandExpo()
+    {
+        return $this->hasMany(BrandExpo::class, 'brand_expo');
     }
 }

@@ -144,8 +144,16 @@ class ExpoController extends Controller
         });
 
         return response()->json([
-            'data' => $brandsWithUrls,  
+            'data' => $brandsWithUrls,
             'status' => 'success'
+        ], 200);
+    }
+    public function existingInvestor(Expo $expo, Brand $brand)
+    {
+        $expo->brands()->sync($brand->id);
+        return response()->json([
+            'data' => null,
+            'status' => 'brand added to your expo successfully'
         ], 200);
     }
 }

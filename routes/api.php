@@ -19,7 +19,7 @@ Route::group(
 Route::get('expos', [ExpoController::class, 'index']);
 Route::get('products', [ProductController::class, 'index']);
 Route::get('brands', [BrandController::class, 'index']);
-
+Route::get('expos/{id}/brands', [ExpoController::class, 'expoBrands']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
    Route::post('auth/add-investor', [AuthenticationController::class, 'addInvestor']);
@@ -29,7 +29,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
    Route::get('expos/{id}', [ExpoController::class, 'show']);
    Route::put('expos/{id}', [ExpoController::class, 'update']);
    Route::delete('expos/{id}', [ExpoController::class, 'destroy']);
-   Route::get('expos/{id}/brands', [ExpoController::class, 'expoBrands']);
+   Route::post('/expos/{expo}/brands/{brand}/add-investor', [ExpoController::class, 'existingInvestor']);
+
 
 
    // #Routers To Buy things
