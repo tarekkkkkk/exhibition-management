@@ -37,6 +37,7 @@ class ExpoController extends Controller
         $expo = Expo::create([
             'name' => $request->name,
             'info' => $request->info,
+            'user_id' => auth()->user()->id
         ]);
 
         if ($request->hasFile('image')) {

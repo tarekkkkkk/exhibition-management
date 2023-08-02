@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(
 
-   ['prefix' => 'Auth'],
+   ['prefix' => 'auth'],
 
    function () {
-      Route::post('Reg', [AuthenticationController::class, 'register']);
+      Route::post('reg', [AuthenticationController::class, 'register']);
       Route::get('login', [AuthenticationController::class, 'login']);
    }
 );
@@ -22,6 +22,8 @@ Route::get('brands', [BrandController::class, 'index']);
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
+   Route::post('auth/add-investor', [AuthenticationController::class, 'addInvestor']);
+
    // #Routers for EXPO
    Route::post('expos', [ExpoController::class, 'store']);
    Route::get('expos/{id}', [ExpoController::class, 'show']);

@@ -12,7 +12,8 @@ class Expo extends Model
     protected $fillable = [
         'name',
         'info',
-        'image'
+        'image',
+        'user_id'
     ];
 
     public function brands()
