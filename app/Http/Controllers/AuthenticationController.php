@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +21,7 @@ class AuthenticationController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role_id' => Role::where('name', 'USER')->first()->id
             // 'confirm_password' => $request->confirm_password    
         ]);
 
@@ -39,10 +41,13 @@ class AuthenticationController extends Controller
         $user = User::where('email',   $request->email)->first();
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
+
                 $tokenResult = $user->createToken('token')->plainTextToken;
+                $user->load('role');
                 return response()->json([
-                    'data' => ['access_token' => $tokenResult],
-                    'user' => $user,
+                    'data' => [
+                        'user' => $user,
+                    ],
                     'token' => $tokenResult,
                     'status' => 200,
                     'message' => 'Login Successfuly'

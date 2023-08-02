@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'confirm_password',
+        'role_id'
     ];
 
     /**
@@ -63,5 +64,10 @@ class User extends Authenticatable
     public function expo()
     {
         return $this->hasMany(Expo::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 }
