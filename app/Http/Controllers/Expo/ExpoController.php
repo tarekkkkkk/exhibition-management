@@ -156,4 +156,5 @@ class ExpoController extends Controller
             'status' => 'brand added to your expo successfully'
         ], 200);
     }
+
 }

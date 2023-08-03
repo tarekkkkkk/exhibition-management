@@ -39,6 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
    Route::put('products/{id}', [ProductController::class, 'update']);
    Route::delete('products/{id}', [ProductController::class, 'destroy']);
    Route::get('fav-products', [ProductController::class, 'favouriteProducts']);
+   Route::get('/expos/{expo}/brands/{brand}/products', [ProductController::class, 'productInBrand']);
 
    // #Routers About Brands
    Route::post('brands', [BrandController::class, 'store']);

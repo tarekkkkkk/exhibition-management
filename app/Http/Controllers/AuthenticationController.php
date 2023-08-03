@@ -91,7 +91,7 @@ class AuthenticationController extends Controller
         $brand = Brand::create([
             'name' => $request->brand_name,
             'info' => $request->brand_info,
-            'user_id' => $user->id
+            'user_id' => auth()->user()->id
         ]);
 
         $brand->expos()->sync($request->expo_id);

@@ -19,7 +19,7 @@ class Brand extends Model
     {
         return $this->hasMany(Product::class);
     }
-
+    
     public function expos()
     {
         return $this->belongsToMany(Expo::class, 'brand_expo');

@@ -12,7 +12,7 @@ class BrandController extends Controller
 {
     public function index()
     {
-        $brands = Brand::select('id', 'name', 'info', 'expo_id', 'image')->get();
+        $brands = Brand::select('id', 'name', 'info', 'image')->get();
 
         $brandsWithUrls = $brands->map(function ($item, $key) {
             $item->image = url('/storage' . $item->image);

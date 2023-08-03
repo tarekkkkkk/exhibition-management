@@ -27,6 +27,6 @@ class Expo extends Model
 
     public function brandExpo()
     {
-        return $this->hasMany(BrandExpo::class, 'brand_expo');
+        return $this->hasMany(BrandExpo::class);
     }
 }

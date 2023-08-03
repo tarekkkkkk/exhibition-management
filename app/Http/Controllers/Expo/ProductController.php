@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Expo;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use App\Models\Expo;
 use App\Models\Favourite;
@@ -192,6 +193,14 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'All products in favourite',
             'data' => $products
+        ], 200);
+    }
+    public function productInBrand(Expo $expo, Brand $brand)
+    {
+        $brandExpo = $expo->brandExpo()?->where('brand_id', $brand->id)->first();
+        return response()->json([
+            'data' => $brandExpo->products,
+            'status' => 'brand added to your expo successfully'
         ], 200);
     }
 }
