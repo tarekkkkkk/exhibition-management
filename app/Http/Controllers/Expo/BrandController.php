@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Expo;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\Expo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::select('id', 'name', 'info', 'image')->get();
+        $brands = Brand::select('id', 'name', 'info', 'image');
 
+        $brands->get();
         $brandsWithUrls = $brands->map(function ($item, $key) {
             $item->image = url('/storage' . $item->image);
             return $item;
@@ -29,7 +31,7 @@ class BrandController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string',
             'info' => 'required',
-            'image' => 'required|mimes:png,jpg,jpeg,gif,jfif,svg|max:2048',
+            'image' => 'required',
             'expo_id' => 'required|exists:expos,id'
         ]);
 
@@ -64,7 +66,7 @@ class BrandController extends Controller
                 'id' => $brand->id,
                 'name' => $brand->name,
                 'info' => $brand->info,
-                'expo_id' => (int)$brand->expo_id,
+                // 'expo_id' => (int)$brand->expo_id,
                 'image' => url('storage/' . $brand->image)
             ])
         ], 201);
@@ -81,14 +83,14 @@ class BrandController extends Controller
                     'id' => $brand->id,
                     'name' => $brand->name,
                     'info' => $brand->info,
-                    'expo_id' => (int)$brand->expo_id,
+                    // 'expo_id' => (int)$brand->expo_id,
                     'image' => url('storage/' . $brand->image)
                 ])
             ], 200);
         } else {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Post not found'
+                'message' => 'Brand not found'
             ], 404);
         }
     }
@@ -121,7 +123,7 @@ class BrandController extends Controller
                     'id' => $brand->id,
                     'name' => $brand->name,
                     'info' => $brand->info,
-                    'expo_id' => (int)$brand->expo_id,
+                    // 'expo_id' => (int)$brand->expo_id,
                     'image' => url('storage/' . $brand->image)
                 ])
             ], 200);
@@ -158,5 +160,23 @@ class BrandController extends Controller
         return response()->json([
             'data' => $brand
         ]);
+    }
+
+
+    public function notJoinedBrands(Expo $expo)
+    {
+
+        $brands = Brand::select('id', 'name', 'info', 'image');
+        $brands = $brands->whereNotIn('id', ($expo->brands()->get()->pluck('id')->toArray()));
+        $brands = $brands->get();
+        $brandsWithUrls = $brands->map(function ($item, $key) {
+            $item->image = url('/storage' . $item->image);
+            return $item;
+        });
+
+        return response()->json([
+            'data' => $brandsWithUrls,
+            'status' => 'success'
+        ], 200);
     }
 }

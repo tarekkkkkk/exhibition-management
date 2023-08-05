@@ -8,15 +8,23 @@ use Illuminate\Http\Request;
 use App\Models\Expo;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use PhpParser\Node\Stmt\Foreach_;
 
 class ExpoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $expos = Expo::select('id', 'name', 'info', 'image')->get();
+        $expos = Expo::select('id', 'name', 'info', 'image', 'user_id', 'address')->get();
 
-        $exposWithUrls = $expos->map(function ($item, $key) {
+        $exposWithUrls = $expos->map(function ($item, $key) use ($request) {
+            if ($request->user('sanctum')?->role->name == "OWNER") {
+                if ($item->user->id == $request->user('sanctum')?->id) {
+                    $item->is_owned = true;
+                } else {
+                    $item->is_owned = false;
+                }
+            } else {
+                $item->is_owned = false;
+            }
             $item->image = url('/storage' . $item->image);
             return $item;
         });
@@ -31,13 +39,15 @@ class ExpoController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string',
             'info' => 'required',
-            'image' => 'required|mimes:png,jpg,jpeg,gif,jfif,svg|max:2048',
+            'image' => 'required',
+            'address' => 'required|string'
         ]);
 
         $expo = Expo::create([
             'name' => $request->name,
             'info' => $request->info,
-            'user_id' => auth()->user()->id
+            'user_id' => auth()->user()->id,
+            'address' => $request->address
         ]);
 
         if ($request->hasFile('image')) {
@@ -56,6 +66,7 @@ class ExpoController extends Controller
                 'name' => $expo->name,
                 'info' => $expo->info,
                 'image' => url('storage/' . $expo->image),
+                'address' => $expo->address
             ]),
             'message' => 'Items has been added succefully',
         ], 201);
@@ -70,6 +81,7 @@ class ExpoController extends Controller
                     'id' => $expo->id,
                     'name' => $expo->name,
                     'info' => $expo->info,
+                    'address' => $expo->address,
                     'image' => url('storage/' . $expo->image),
                 ]),
             ], 200);
@@ -103,6 +115,7 @@ class ExpoController extends Controller
                     'name' => $expo->name,
                     'info' => $expo->info,
                     'image' => url('storage/' . $expo->image),
+                    'address' => $expo->address
                 ]),
             ], 200);
         } else {
@@ -131,14 +144,23 @@ class ExpoController extends Controller
         }
     }
 
-    public function expoBrands($id)
+    public function expoBrands($id, Request $request)
     {
         $expo = Expo::findOrFail($id);
 
         // $brands = Brand::where('expo_id', $expo->id)->select('id', 'name', 'info', 'image')->get();
         $brands = $expo->brands;
 
-        $brandsWithUrls = $brands->map(function ($item, $key) {
+        $brandsWithUrls = $brands->map(function ($item, $key) use ($request) {
+            if ($request->user('sanctum')?->role->name == "INVESTOR") {
+                if ($item->user_id == $request->user('sanctum')?->id) {
+                    $item->is_owned = true;
+                } else {
+                    $item->is_owned = false;
+                }
+            } else {
+                $item->is_owned = false;
+            }
             $item->image = url('/storage' . $item->image);
             return $item;
         });
@@ -150,11 +172,10 @@ class ExpoController extends Controller
     }
     public function existingInvestor(Expo $expo, Brand $brand)
     {
-        $expo->brands()->sync($brand->id);
+        $expo->brands()->syncWithoutDetaching($brand->id);
         return response()->json([
             'data' => null,
-            'status' => 'brand added to your expo successfully'
+            'message' => 'brand added to your expo successfully'
         ], 200);
     }
-
 }

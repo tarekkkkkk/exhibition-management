@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddInvestorRequest;
 use App\Models\Brand;
 use App\Models\Role;
 use App\Models\User;
+// use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use PharIo\Manifest\Author;
+// use Illuminate\Foundation\Http\FormRequest;
+use app\Http\Requests\NewFormRequest;
+// use Illuminate\Http\request;
+use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\NewFormRequest\adminAuth;
+
 
 class AuthenticationController extends Controller
 {
@@ -57,7 +66,7 @@ class AuthenticationController extends Controller
             } else {
                 return Response()->json([
                     'data' => null,
-                    'message' => 'worng Password'
+                    'message' => 'Worng Password'
                 ], 422);
             }
         } else {
@@ -68,7 +77,7 @@ class AuthenticationController extends Controller
         }
     }
 
-    public function addInvestor(Request $request)
+    public function addInvestor(AddInvestorRequest $request)
     {
         $request->validate([
             'name' => 'required|string',
@@ -76,7 +85,7 @@ class AuthenticationController extends Controller
             'password' => 'required|string|min:6',
             'confirm_password' => 'required|string|min:6|same:password',
             'brand_name' => 'required|string',
-            'brand_image' => 'required|mimes:png,jpg,jpeg,gif,jfif,svg|max:2048',
+            'brand_image' => 'required',
             'brand_info' => 'required|string',
             'expo_id' => 'required|exists:expos,id'
         ]);
@@ -91,13 +100,13 @@ class AuthenticationController extends Controller
         $brand = Brand::create([
             'name' => $request->brand_name,
             'info' => $request->brand_info,
-            'user_id' => auth()->user()->id
+            'user_id' => $user->id
         ]);
 
         $brand->expos()->sync($request->expo_id);
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+        if ($request->hasFile('brand_image')) {
+            $image = $request->file('brand_image');
             $fileName = time() . '-' . $image->getClientOriginalName();
             Storage::disk('public')->put('/brand-images' . '/' . $fileName, File::get($image));
             $brand->image = '/brand-images' . '/' .  $fileName;
