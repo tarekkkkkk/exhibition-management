@@ -86,7 +86,8 @@ class ProductController extends Controller
                     'name' => $product->name,
                     'price' => $product->price,
                     'brand_id' => $product->brand_id,
-                    'is_added_to_favourite' => Favourite::where('product_id',  $product->id)->where('user_id',  $request->user('sanctum')?->id) ? true : false,
+                    'info' => $product->info,
+                    'is_added_to_favourite' => Favourite::where('product_id',  $product->id)->where('user_id',  $request->user('sanctum')->id)->exists() ? true : false,
                     'image' => url('storage/' . $product->image)
                 ])
             ], 200);
@@ -126,6 +127,7 @@ class ProductController extends Controller
                     'name' => $product->name,
                     'price' => (int)$product->price,
                     'brand_id' => (int)$product->brand_id,
+                    'info' => (int)$product->info,
                     'image' => url('storage/' . $product->image)
                 ])
             ], 200);

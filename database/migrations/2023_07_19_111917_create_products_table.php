@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('info');
             $table->string('image')->nullable();
             $table->foreignId('brand_expo_id')->nullable()->constrained('brand_expo');
+            
             $table->timestamps();
         });
     }

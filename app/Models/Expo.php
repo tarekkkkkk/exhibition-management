@@ -14,7 +14,8 @@ class Expo extends Model
         'info',
         'image',
         'user_id',
-        'address'
+        'address',
+        'expires_at'
     ];
 
     public function brands()

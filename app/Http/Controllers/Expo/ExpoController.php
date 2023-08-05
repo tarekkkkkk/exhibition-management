@@ -13,7 +13,9 @@ class ExpoController extends Controller
 {
     public function index(Request $request)
     {
-        $expos = Expo::select('id', 'name', 'info', 'image', 'user_id', 'address')->get();
+        $expos = Expo::select('id', 'name', 'info', 'image', 'user_id', 'address', 'expires_at')
+            ->where('expires_at', '>=', now())
+            ->get();
 
         $exposWithUrls = $expos->map(function ($item, $key) use ($request) {
             if ($request->user('sanctum')?->role->name == "OWNER") {
@@ -40,14 +42,16 @@ class ExpoController extends Controller
             'name' => 'required|string',
             'info' => 'required',
             'image' => 'required',
-            'address' => 'required|string'
+            'address' => 'required|string',
+            'expires_at' => 'required'
         ]);
 
         $expo = Expo::create([
             'name' => $request->name,
             'info' => $request->info,
             'user_id' => auth()->user()->id,
-            'address' => $request->address
+            'address' => $request->address,
+            'expires_at' => $request->expires_at
         ]);
 
         if ($request->hasFile('image')) {
@@ -66,7 +70,8 @@ class ExpoController extends Controller
                 'name' => $expo->name,
                 'info' => $expo->info,
                 'image' => url('storage/' . $expo->image),
-                'address' => $expo->address
+                'address' => $expo->address,
+                'expires_at' => $expo->expires_at,
             ]),
             'message' => 'Items has been added succefully',
         ], 201);
@@ -82,6 +87,7 @@ class ExpoController extends Controller
                     'name' => $expo->name,
                     'info' => $expo->info,
                     'address' => $expo->address,
+                    'expires_at' => $expo->expires_at,
                     'image' => url('storage/' . $expo->image),
                 ]),
             ], 200);
