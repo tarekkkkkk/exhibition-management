@@ -27,8 +27,18 @@ class AuthenticationController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|min:6',
-            'confirm_password' => 'required|string|min:6|same:password'
+            'confirm_password' => 'required|string|min:6|same:password',
+            'owner_code' => 'int'
         ]);
+        // $u = User::all();
+        if ('ownr_code' == 4) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role_id' => Role::where('name', 'OWNER')->first()->id
+            ]);
+        }
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
