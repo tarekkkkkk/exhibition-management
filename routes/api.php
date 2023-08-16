@@ -14,6 +14,8 @@ Route::group(
    function () {
       Route::post('reg', [AuthenticationController::class, 'register']);
       Route::get('login', [AuthenticationController::class, 'login']);
+      Route::post('/password/reset', [AuthenticationController::class, 'reset'])->name('password.reset');
+
    }
 );
 

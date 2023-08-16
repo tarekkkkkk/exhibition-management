@@ -17,6 +17,8 @@ use app\Http\Requests\NewFormRequest;
 // use Illuminate\Http\request;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\NewFormRequest\adminAuth;
+use Illuminate\Support\Facades\Password;
+
 
 
 class AuthenticationController extends Controller
@@ -28,10 +30,10 @@ class AuthenticationController extends Controller
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|min:6',
             'confirm_password' => 'required|string|min:6|same:password',
-            'owner_code' => 'int'
+            'owner_code' => 'integer'
         ]);
         // $u = User::all();
-        if ('ownr_code' == 4) {
+        if ($request->ownr_code == 4) {
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -39,6 +41,7 @@ class AuthenticationController extends Controller
                 'role_id' => Role::where('name', 'OWNER')->first()->id
             ]);
         }
+        else{
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -51,6 +54,7 @@ class AuthenticationController extends Controller
             'message' => 'User has been Registered successfully'
         ], 200);
     }
+}
 
     public function login(Request $request)
     {
@@ -127,5 +131,31 @@ class AuthenticationController extends Controller
             'data' => null,
             'message' => 'User created successfully'
         ], 200);
+    }
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+            'password_confirmation' => 'required|string|min:6|same:password',
+            'token' => 'required'
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->save();
+            }
+        );
+
+        dd($request->$status);
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json(['message' => 'Password has been reset successfully']);
+        } else {
+            return response()->json(['message' => 'Password reset failed'], 422);
+        }
     }
 }
